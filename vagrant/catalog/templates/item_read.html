@@ -1,0 +1,19 @@
+{% extends 'base.html' %} {% block content %}
+
+<!-- BREADCRUMB WIDGET -->
+<ul class="uk-breadcrumb">
+    <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
+    <li><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
+    <li class="uk-active"><a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">{{item.title}}</a></li>
+</ul>
+
+<h2>{{item.title}}</h2>
+
+<p>{{item.description}}</p>
+
+{% if authenticated %}
+<a href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">edit</a>
+<a href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">delete</a>
+{% endif %}
+
+{% endblock %}

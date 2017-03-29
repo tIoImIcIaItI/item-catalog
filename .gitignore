@@ -1,0 +1,8 @@
+# Compiled Python files
+**/*.pyc
+
+# PyCharm directory
+\.idea/
+
+# Google Client Secrets file
+client_secrets.json

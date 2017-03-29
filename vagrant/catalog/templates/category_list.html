@@ -1,0 +1,35 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<!-- BREADCRUMB WIDGET -->
+<ul class="uk-breadcrumb">
+    <li class="uk-active"><a href="{{ url_for('get_categories') }}">Categories</a></li>
+</ul>
+
+<h1>Categories</h1>
+
+{% if authenticated %}
+<a href="{{ url_for('create_category') }}">new category</a>
+{% endif %}
+
+<!-- CATEGORY LIST -->
+<ul class="uk-grid uk-grid-small">
+    {% for category in categories %}
+    <li class="uk-width-large-1-3 uk-width-medium-1-2 uk-width-small-1-1">
+        <a href="{{ url_for('get_category_by_id', category_id=category.id) }}">
+            <div class="uk-panel uk-panel-hover uk-panel-space">
+
+                <h2 uk-panel-title>{{category.name}}</h2>
+
+                <!--<div class="uk-panel-badge uk-badge">42</div>-->
+
+                <!--<a href="{{url_for('update_category_by_id', category_id=category.id )}}">edit</a>-->
+                <!--<a href="{{url_for('delete_category_by_id', category_id=category.id )}}">delete</a>-->
+
+            </div>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

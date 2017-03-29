@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- BREADCRUMB WIDGET -->
+<ul class="uk-breadcrumb">
+    <li ><a href="{{ url_for('get_categories') }}">Categories</a></li>
+    <li class="uk-active"><a href="{{ url_for('create_category') }}">new category</a></li>
+</ul>
+
+<h1>New Category</h1>
+
+<form action="{{ url_for('create_category') }}" method='POST'>
+
+    <label for="name">Name:</label>
+
+    <input type='text' size='30' id='name' name='name'>
+
+    <input type='submit' value='Create'>
+
+</form>
+
+<a href="{{ url_for('get_categories') }}">cancel</a>
+
+{% endblock %}
