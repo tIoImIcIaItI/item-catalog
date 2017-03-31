@@ -2,7 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"> {% if page_title %}
+    <meta charset="UTF-8">
+    {% if page_title %}
     <title>Catalog App - {{ page_title }} </title>
     {% else %}
     <title>Catalog App</title>
@@ -56,12 +57,12 @@
             <li><strong>{{message}}</strong></li>
             {% endfor %}
         </ul>
-        {% endif %} {% endwith %} 
-        
-        {% block content %} 
+        {% endif %} {% endwith %}
+
+        {% block content %}
         {% endblock %}
 
     </div>
-</body>
 
+</body>
 </html>

@@ -25,8 +25,8 @@ app = Flask(__name__)
 # -----------------------------------------------------------------------------
 # USERS, AUTHENTICATION, and AUTHORIZATION
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web'][
-    'client_id']
+CLIENT_ID = \
+    json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Item Catalog"
 
 
@@ -49,8 +49,40 @@ def get_user_handle():
 
     return \
         login_session['username'] \
-        if 'username' in login_session and len(login_session['username']) > 0 \
-        else login_session['email']
+            if 'username' in login_session and len(
+            login_session['username']) > 0 \
+            else login_session['email']
+
+
+def unset_preauthentication_url():
+    del login_session['return-to-url']
+
+
+def set_preauthentication_url():
+    login_session['return-to-url'] = request.referrer
+
+
+def get_preauthentication_url():
+    if 'return-to-url' in login_session:
+        url = login_session.get('return-to-url')
+        if url:
+            return url
+
+    return '/'
+
+
+def respond_with_preauthentication_url():
+    response = make_response(
+        json.dumps({'redirect': get_preauthentication_url()}),
+        200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+
+def return_to_preauthentication_url():
+    url = get_preauthentication_url()
+    unset_preauthentication_url()
+    return redirect(url)
 
 
 @app.route(
@@ -108,12 +140,9 @@ def gconnect():
 
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(
-            json.dumps('Current user is already connected.'),
-            200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    if stored_access_token is not None and gplus_id == stored_gplus_id and \
+                    'user_id' in login_session:
+        return respond_with_preauthentication_url()
 
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
@@ -142,28 +171,20 @@ def gconnect():
 
     handle = get_user_handle()
 
-    output = ''
-    output += '<h1>Welcome, '
-    output += handle
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: ' \
-              '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-
     flash("you are now logged in as %s" % handle)
     print "done!"
 
-    return output
+    return respond_with_preauthentication_url()
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route(
     '/gdisconnect')
 def gdisconnect():
-    # If not logged in, we're done, redirect to home mpage
+    set_preauthentication_url()
+
     if 'access_token' not in login_session:
-        return redirect('/')
+        return return_to_preauthentication_url()
 
     access_token = login_session['access_token']
 
@@ -173,7 +194,8 @@ def gdisconnect():
 
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -185,25 +207,24 @@ def gdisconnect():
     print 'result is '
     print result
 
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        del login_session['user_id']
-
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-
-        return response
-    else:
-
+    if result['status'] != '200':
         response = make_response(
             json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-
         return response
+
+    del login_session['access_token']
+    del login_session['gplus_id']
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    del login_session['user_id']
+
+    # response = make_response(json.dumps('Successfully disconnected.'), 200)
+    # response.headers['Content-Type'] = 'application/json'
+    # return response
+
+    return return_to_preauthentication_url()
 
 
 def is_authenticated():
@@ -213,6 +234,8 @@ def is_authenticated():
 @app.route(
     '/login')
 def get_login_page():
+    set_preauthentication_url()
+
     # Create anti-forgery state token
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
@@ -265,6 +288,7 @@ def get_authenticated_user_id():
     methods=['GET', 'POST'])
 def create_category():
     if not is_authenticated():
+        set_preauthentication_url()
         return redirect('/login')
 
     if request.method == 'POST':
@@ -307,6 +331,7 @@ def get_category_by_id(category_id):
         'category_items.html',
         category=category,
         items=items,
+        category_in_use=category_is_in_use(category.id),
         page_title="%s Category" % category.name)
 
 
@@ -315,6 +340,7 @@ def get_category_by_id(category_id):
     methods=['GET', 'POST'])
 def update_category_by_id(category_id):
     if not is_authenticated():
+        set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Category).filter_by(id=category_id).one()
@@ -336,16 +362,20 @@ def update_category_by_id(category_id):
             page_title="%s %s Category" % ("Edit", item.name))
 
 
+def category_is_in_use(category_id):
+    return session.query(Item).filter_by(category_id=category_id).count()
+
+
 @app.route(
     '/categories/<int:category_id>/delete',
     methods=['GET', 'POST'])
 def delete_category_by_id(category_id):
     if not is_authenticated():
+        set_preauthentication_url()
         return redirect('/login')
 
     # Cannot delete a category with items
-    is_used = session.query(Item).filter_by(category_id=category_id).count()
-    if is_used:
+    if category_is_in_use(category_id):
         abort(403)
 
     item = session.query(Category).filter_by(id=category_id).one()
@@ -369,15 +399,24 @@ def delete_category_by_id(category_id):
 # CATEGORY JSON ENDPOINTS
 
 @app.route(
-    '/api/categories/json')
+    '/api/categories/')
 def api_get_categories():
     categories = session.query(Category).all()
 
-    return jsonify(categories=[i.serialize for i in categories])
+    def serialize(c):
+        return {
+            'id': c.id,
+            'name': c.name,
+            'items_url': url_for(
+                'api_get_items_by_category_id', category_id=c.id)
+        }
+
+    return jsonify(
+        categories=[serialize(category) for category in categories])
 
 
 @app.route(
-    '/api/categories/<int:category_id>/json')
+    '/api/categories/<int:category_id>/')
 def api_get_category(category_id):
     category = \
         session.query(Category).filter_by(id=category_id).one()
@@ -385,17 +424,29 @@ def api_get_category(category_id):
     items = \
         session.query(Item).filter_by(category_id=category_id).all()
 
-    items = [i.serialize for i in items]
-
-    def serialize(r):
+    def serialize_item(i):
         return {
-            'id': r.id,
-            'user_id': r.user_id,
-            'name': r.name,
+            'id': i.id,
+            'user_id': i.user_id,
+            'category_id': i.category_id,
+            'url': url_for(
+                'api_get_item_by_id',
+                category_id=i.category_id, item_id=i.id),
+            'title': i.title,
+            'description': i.description
+        }
+
+    items = [serialize_item(item) for item in items]
+
+    def serialize(c):
+        return {
+            'id': c.id,
+            'name': c.name,
             'items': items
         }
 
-    return jsonify(category=serialize(category))
+    return jsonify(
+        category=serialize(category))
 
 
 # -----------------------------------------------------------------------------
@@ -407,6 +458,7 @@ def api_get_category(category_id):
 def create_item(category_id):
     if not is_authenticated():
         flash('login to create an item')
+        set_preauthentication_url()
         return redirect('/login')
 
     if request.method == 'POST':
@@ -444,7 +496,8 @@ def get_item_by_id(category_id, item_id):
         'item_read.html',
         category=category,
         category_id=category_id,
-        item=item)
+        item=item,
+        page_title="%s Item" % item.title)
 
 
 @app.route(
@@ -452,7 +505,7 @@ def get_item_by_id(category_id, item_id):
     methods=['GET', 'POST'])
 def update_item_by_id(category_id, item_id):
     if not is_authenticated():
-        flash('login to edit an item')
+        set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
@@ -480,7 +533,8 @@ def update_item_by_id(category_id, item_id):
             'item_update.html',
             category=category,
             category_id=category_id,
-            item=item)
+            item=item,
+            page_title="%s %s Item" % ("Edit", item.title))
 
 
 @app.route(
@@ -488,7 +542,7 @@ def update_item_by_id(category_id, item_id):
     methods=['GET', 'POST'])
 def delete_item_by_id(category_id, item_id):
     if not is_authenticated():
-        flash('login to delete an item')
+        set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
@@ -514,20 +568,54 @@ def delete_item_by_id(category_id, item_id):
             'item_delete.html',
             category=category,
             category_id=category_id,
-            item=item)
+            item=item,
+            page_title="%s %s Item" % ("Delete", item.title))
 
 
 # -----------------------------------------------------------------------------
 # ITEM JSON ENDPOINTS
 
 @app.route(
-    '/api/categories/<int:category_id>/items/json')
+    '/api/categories/<int:category_id>/items/')
 def api_get_items_by_category_id(category_id):
-    # category = session.query(Category).filter_by(id=category_id).one()
-
     items = session.query(Item).filter_by(category_id=category_id).all()
 
-    return jsonify(items=[i.serialize for i in items])
+    def serialize(i):
+        return {
+            'id': i.id,
+            'url': url_for(
+                'api_get_item_by_id',
+                category_id=i.category_id,
+                item_id=i.id),
+            'user_id': i.user_id,
+            'category_id': i.category_id,
+            'title': i.title,
+            'description': i.description
+        }
+
+    return jsonify(items=[serialize(item) for item in items])
+
+
+@app.route(
+    '/api/categories/<int:category_id>/items/<int:item_id>/')
+def api_get_item_by_id(category_id, item_id):
+    item = session.query(Item). \
+        filter_by(category_id=category_id, id=item_id). \
+        one()
+
+    def serialize_item(i):
+        return {
+            'id': i.id,
+            'user_id': i.user_id,
+            'category_id': i.category_id,
+            'category_url': url_for(
+                'api_get_category',
+                category_id=i.category_id),
+            'title': i.title,
+            'description': i.description
+        }
+
+    return jsonify(item=serialize_item(item))
 
 
 # -----------------------------------------------------------------------------

@@ -8,7 +8,7 @@
     <li class="uk-active"><a href="{{ url_for('delete_item_by_id', category_id=category.id, item_id=item.id) }}">delete item</a></li>
 </ul>
 
-<h1> Are you sure you want to delete {{item.title}}? </h1>
+<p>Are you sure you want to delete item <strong>{{item.title}}</strong>?</p>
 
 <form action="{{ url_for('delete_item_by_id', category_id=item.category_id, item_id=item.id)}}" method='post'>
 

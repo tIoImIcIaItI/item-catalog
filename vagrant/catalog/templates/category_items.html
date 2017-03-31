@@ -11,11 +11,13 @@
 
 {% if authenticated %}
 <a href="{{url_for('update_category_by_id', category_id=category.id )}}">edit</a>
-<a href="{{url_for('delete_category_by_id', category_id=category.id )}}">delete</a> 
-{% endif %} 
+{% if not category_in_use %}
+<a href="{{url_for('delete_category_by_id', category_id=category.id )}}">delete</a>
+{% endif %}
+{% endif %}
 
 {% if authenticated %}
-<a href="{{url_for('create_item', category_id=category.id )}}">new item</a> 
+<a href="{{url_for('create_item', category_id=category.id )}}">new item</a>
 {% endif %}
 
 <!-- ITEMS -->
@@ -35,7 +37,7 @@
             </div>
         </a>
     </li>
-    {% endfor %} 
+    {% endfor %}
 </ul>
 
 {% endblock %}
