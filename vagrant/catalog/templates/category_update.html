@@ -8,16 +8,28 @@
     <li class="uk-active"><a href="{{url_for('update_category_by_id', category_id=category.id )}}">edit category</a></li>
 </ul>
 
-<h1>Edit Category</h1>
+<h1>Edit {{ category.name }}</h1>
 
-<form action="{{ url_for('update_category_by_id', category_id=category.id) }}" method='POST'>
+<form class="uk-form uk-form-stacked" data-uk-margin
+    action="{{ url_for('update_category_by_id', category_id=category.id) }}" 
+    method='POST'>
 
-    <label for="name">Name:</label>
-    <input type='text' size='30' id="name" name='name' placeholder='{{ category.name }}' value='{{ category.name or ""}}'>
+    <fieldset class="uk-form-row">
+        <label class="uk-form-label" for="name">Name</label>
+        <input type='text' size='30' id="name" name='name' placeholder='{{ category.name }}' value='{{ category.name or ""}}'>
+    </fieldset>
 
-    <input type='submit' value='save'>
+    <fieldset>
+        
+        <button class="uk-button uk-button-primary" type='submit' >
+            <i class="fa fa-check" aria-hidden="true"></i>
+            save
+        </button>
+
+        <a class="uk-button uk-button-mini" href="{{ url_for('get_category_by_id', category_id=category.id) }}">cancel</a> 
+
+    </fieldset>
+
 </form>
-
-<a href="{{ url_for('get_category_by_id', category_id=category.id) }}">cancel</a>
 
 {% endblock %}

@@ -12,8 +12,16 @@
 <p>{{item.description}}</p>
 
 {% if authenticated %}
-<a href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">edit</a>
-<a href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">delete</a>
+<div class="uk-button-group">
+    <a class="uk-button" href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
+        <i class="fa fa-pencil" aria-hidden="true"></i>
+        <span class="">edit</span>
+    </a>
+    <a class="uk-button" href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
+        <i class="fa fa-trash-o"aria-hidden="true"></i>
+        <span class="">delete</span>
+    </a>
+</div>
 {% endif %}
 
 {% endblock %}

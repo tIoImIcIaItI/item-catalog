@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+{% block content %}
 
 <!-- BREADCRUMB WIDGET -->
 <ul class="uk-breadcrumb">
@@ -8,15 +9,26 @@
     <li class="uk-active"><a href="{{ url_for('delete_item_by_id', category_id=category.id, item_id=item.id) }}">delete item</a></li>
 </ul>
 
+<h1>Delete {{ item.title }}</h1>
+
 <p>Are you sure you want to delete item <strong>{{item.title}}</strong>?</p>
 
-<form action="{{ url_for('delete_item_by_id', category_id=item.category_id, item_id=item.id)}}" method='post'>
+<form class="uk-form uk-form-stacked" data-uk-margin
+    action="{{ url_for('delete_item_by_id', category_id=item.category_id, item_id=item.id)}}" 
+    method='POST'>
 
-    <input type='submit' value='delete'>
+    <fieldset class="uk-form-row">
+        
+        <button class="uk-button uk-button-primary uk-button-danger" type='submit' >
+            <i class="fa fa-trash-o" aria-hidden="true"></i>
+            delete
+        </button>
+        
+        <a class="uk-button uk-button-mini" href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">cancel</a>
+
+    </fieldset>
 
 </form>
-
-<a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">cancel</a>
 
 {% endblock %}
 

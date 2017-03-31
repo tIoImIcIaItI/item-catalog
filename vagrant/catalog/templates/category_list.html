@@ -9,7 +9,12 @@
 <h1>Categories</h1>
 
 {% if authenticated %}
-<a href="{{ url_for('create_category') }}">new category</a>
+<div class="">
+    <a class="uk-button" href="{{ url_for('create_category') }}">
+        <i class="fa fa-plus"aria-hidden="true"></i>
+        <span class="">new category</span>
+    </a>
+</div>
 {% endif %}
 
 <!-- CATEGORY LIST -->

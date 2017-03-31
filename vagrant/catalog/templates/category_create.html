@@ -9,16 +9,26 @@
 
 <h1>New Category</h1>
 
-<form action="{{ url_for('create_category') }}" method='POST'>
+<form class="uk-form uk-form-stacked" data-uk-margin 
+    action="{{ url_for('create_category') }}" 
+    method='POST'>
 
-    <label for="name">Name:</label>
+    <fieldset class="uk-form-row">
+        <label class="uk-form-label" for="name">Name</label>
+        <input type='text' size='30' id='name' name='name'>
+    </fieldset>
 
-    <input type='text' size='30' id='name' name='name'>
+    <fieldset class="uk-form-row">
 
-    <input type='submit' value='Create'>
+        <button class="uk-button uk-button-primary" type='submit' >
+            <i class="fa fa-plus" aria-hidden="true"></i>
+            create
+        </button>
+    
+        <a class="uk-button uk-button-mini" href="{{ url_for('get_categories') }}">cancel</a>
+
+    </fieldset>
 
 </form>
-
-<a href="{{ url_for('get_categories') }}">cancel</a>
 
 {% endblock %}

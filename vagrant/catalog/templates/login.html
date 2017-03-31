@@ -8,7 +8,8 @@
     <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/core/dropdown.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/uikit.almost-flat.min.css') }}">
-    <!--<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">-->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
     <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>-->
@@ -21,15 +22,9 @@
 
     <nav class="uk-navbar uk-navbar-attached">
 
-        <!--<a class="uk-navbar-brand uk-hidden-small" href="../index.html"><img class="uk-margin uk-margin-remove" src="images/logo_uikit.svg" width="90" height="30" title="UIkit" alt="UIkit"></a>-->
-
         <ul class="uk-navbar-nav">
             <li><a href="{{ url_for('get_categories') }}">Home</a></li>
         </ul>
-
-        <!--<a href="#tm-offcanvas" class="uk-navbar-toggle uk-visible-small" data-uk-offcanvas=""></a>-->
-
-        <!--<div class="uk-navbar-brand uk-navbar-center uk-visible-small"><img src="images/logo_uikit.svg" width="90" height="30" title="UIkit" alt="UIkit"></div>-->
 
         <div class="uk-navbar-flip uk-hidden-small">
             <ul class="uk-navbar-nav">

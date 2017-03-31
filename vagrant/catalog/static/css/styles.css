@@ -1,0 +1,16 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+    color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    color: #333;
+    text-transform: uppercase;
+    /* color | offset-x | offset-y | blur-radius */
+    text-shadow: #CCC 1px 1px 6px; 
+}
+
+a {
+    text-transform: lowercase;
+}
