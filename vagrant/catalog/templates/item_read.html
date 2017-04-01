@@ -1,27 +1,33 @@
 {% extends 'base.html' %} {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
-<ul class="uk-breadcrumb">
-    <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
-    <li><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
-    <li class="uk-active"><a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">{{item.title}}</a></li>
-</ul>
+<nav aria-label="breadcrumb" class="breadcrumbs">
+    <ol class="uk-breadcrumb" >
+        <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
+        <li><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
+        <li class="uk-active"><a href="#main" aria-current="page">{{item.title}}</a></li>
+    </ol>
+</nav>
 
-<h2>{{item.title}}</h2>
+<main id="main">
+   
+<h1 class="user-content">{{item.title}}</h1>
 
-<p>{{item.description}}</p>
+<p class="user-content">{{item.description}}</p>
 
 {% if authenticated %}
 <div class="uk-button-group">
-    <a class="uk-button" href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
+    <a class="btn uk-button" href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         <span class="">edit</span>
     </a>
-    <a class="uk-button" href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
+    <a class="btn uk-button" href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
         <span class="">delete</span>
     </a>
 </div>
 {% endif %}
+    
+</main>
 
 {% endblock %}

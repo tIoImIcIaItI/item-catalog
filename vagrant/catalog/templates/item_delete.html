@@ -2,13 +2,17 @@
 {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
-<ul class="uk-breadcrumb">
-    <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
-    <li><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
-    <li><a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">{{item.title}}</a></li>
-    <li class="uk-active"><a href="{{ url_for('delete_item_by_id', category_id=category.id, item_id=item.id) }}">delete item</a></li>
-</ul>
+<nav aria-label="breadcrumb" class="breadcrumbs">
+    <ol class="uk-breadcrumb" >
+        <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
+        <li><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
+        <li><a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">{{item.title}}</a></li>
+        <li class="uk-active"><a href="#main" aria-current="page">delete item</a></li>
+    </ol>
+</nav>
 
+<main id="main">
+   
 <h1>Delete {{ item.title }}</h1>
 
 <p>Are you sure you want to delete item <strong>{{item.title}}</strong>?</p>
@@ -29,6 +33,8 @@
     </fieldset>
 
 </form>
+    
+</main>
 
 {% endblock %}
 

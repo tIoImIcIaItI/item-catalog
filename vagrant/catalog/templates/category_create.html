@@ -2,11 +2,15 @@
 {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
-<ul class="uk-breadcrumb">
-    <li ><a href="{{ url_for('get_categories') }}">Categories</a></li>
-    <li class="uk-active"><a href="{{ url_for('create_category') }}">new category</a></li>
-</ul>
+<nav aria-label="breadcrumb" class="breadcrumbs">
+    <ol class="uk-breadcrumb" >
+        <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
+        <li class="uk-active"><a href="#main" aria-current="page">new category</a></li>
+    </ol>
+</nav>
 
+<main id="main">
+   
 <h1>New Category</h1>
 
 <form class="uk-form uk-form-stacked" data-uk-margin 
@@ -30,5 +34,7 @@
     </fieldset>
 
 </form>
+    
+</main>
 
 {% endblock %}

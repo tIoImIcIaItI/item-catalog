@@ -3,14 +3,40 @@
     color: #333;
 }
 
-h1, h2, h3, h4, h5, h6 {
+body {
+    max-width: 60rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1, h2, h3, h4, h5, h6, .uk-panel-title {
     font-family: 'Montserrat', sans-serif;
     color: #333;
     text-transform: uppercase;
-    /* color | offset-x | offset-y | blur-radius */
-    text-shadow: #CCC 1px 1px 6px; 
+    text-shadow: rgba(128, 128, 128, 0.33) 1px 1px 6px; 
 }
 
-a {
+.user-content {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.breadcrumbs a {
     text-transform: lowercase;
+}
+
+.btn {
+    text-transform: lowercase;
+}
+
+header a {
+    text-transform: uppercase;
+}
+
+nav.breadcrumbs {
+    margin-top: 1em;
+}
+
+nav.breadcrumbs [aria-current="page"] {
+	color: #333;
+	font-weight: 300;
 }

@@ -3,12 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Catalog App - Sign in</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in | Catalog App</title>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="{{ url_for('static', filename='js/uikit.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/core/dropdown.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/uikit.almost-flat.min.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
     <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
@@ -20,51 +22,55 @@
 <body>
 <div class="uk-container uk-container-center">
 
-    <nav class="uk-navbar uk-navbar-attached">
-
-        <ul class="uk-navbar-nav">
-            <li><a href="{{ url_for('get_categories') }}">Home</a></li>
-        </ul>
-
-        <div class="uk-navbar-flip uk-hidden-small">
+    <header role="banner">
+        <!-- MAIN NAVIGATION WIDGET -->
+        <nav class="uk-navbar uk-navbar-attached">
             <ul class="uk-navbar-nav">
+                <li><a href="{{ url_for('get_categories') }}">Home</a></li>
+                <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
             </ul>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <!--MESSAGE FLASHING WIDGET -->
-    {% with messages = get_flashed_messages() %} {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li><strong>{{message}}</strong></li>
-        {% endfor %}
-    </ul>
-    {% endif %} {% endwith %}
-
-
-    <!-- GOOGLE PLUS SIGN IN BUTTON-->
-    <!-- disable data-approvalprompt="force" for PRODUCTION,
-         otherwise signed in users will still have to authenticate every time they visit the login page -->
-    <div id="signInButton">
-    <span class="g-signin"
-          data-scope="openid email"
-          data-clientid="294005127239-u5np37ck1qgslg3gp82iag7b6n2uohl8.apps.googleusercontent.com"
-          data-redirecturi="postmessage"
-          data-accesstype="offline"
-          data-cookiepolicy="single_host_origin"
-          data-callback="signInCallback"
-          data-approvalprompt="force">
-    </span>
+    <div class="uk-container uk-container-center">
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li><strong>{{message}}</strong></li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
     </div>
-    <!--END GOOGLE PLUS SIGN IN BUTTON -->
+
+    <!-- INCLUDED PAGE CONTENT -->
+    <main id="main">
+    
+        <!-- GOOGLE PLUS SIGN IN BUTTON-->
+        <!-- disable data-approvalprompt="force" for PRODUCTION,
+            otherwise signed in users will still have to authenticate every time they visit the login page -->
+        <div id="signInButton">
+            <span class="g-signin"
+                data-scope="openid email"
+                data-clientid="294005127239-u5np37ck1qgslg3gp82iag7b6n2uohl8.apps.googleusercontent.com"
+                data-redirecturi="postmessage"
+                data-accesstype="offline"
+                data-cookiepolicy="single_host_origin"
+                data-callback="signInCallback"
+                data-approvalprompt="force">
+            </span>
+        </div>
+        <!--END GOOGLE PLUS SIGN IN BUTTON -->
+        
+    </main>
 
 </div>
 
 <script>
-//(function (global) {
-//    'use strict';
+(function (global) {
+    'use strict';
 
-    function signInCallback(authResult) {
+    global.signInCallback = function(authResult) {
         if (authResult['code']) {
 
             // Hide the sign-in button now that the user is authorized
@@ -90,20 +96,16 @@
 
                     } else if (authResult['error']) {
 
-                        console.log('There was an error: ' + authResult['error']);
+                        console.error('There was an error: ' + authResult['error']);
                     } else {
 
                         console.error('Failed to make a server-side call. Check your configuration and console.');
-                        //$('#result').html('Failed to make a server-side call. Check your configuration and console.');
                     }
                 }
             });
         }
     }
-
-//    global.signInCallback = signInCallback;
-
-//}(this));
+}(this));
 </script>
 
 </body>

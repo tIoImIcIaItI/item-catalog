@@ -1,25 +1,29 @@
 {% extends 'base.html' %} {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
-<ul class="uk-breadcrumb">
-    <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
-    <li class="uk-active"><a href="{{ url_for('get_category_by_id',category_id=category.id) }}">{{category.name}}</a></li>
-</ul>
+<nav aria-label="breadcrumb" class="breadcrumbs">
+    <ol class="uk-breadcrumb" >
+        <li><a href="{{ url_for('get_categories') }}">Categories</a></li>
+        <li class="uk-active"><a href="#main" aria-current="page">{{category.name}}</a></li>
+    </ol>
+</nav>
 
+<main id="main">
+   
 <!-- CATEGORY -->
-<h1 >{{category.name}}</h1>
+<h1 class="user-content">{{category.name}}</h1>
 {% if authenticated %}
 {% if category_in_use %}
 <div class="">
 {% else %}
 <div class="uk-button-group">
 {% endif %}
-    <a class="uk-button" href="{{url_for('update_category_by_id', category_id=category.id )}}">
+    <a class="btn uk-button" href="{{url_for('update_category_by_id', category_id=category.id )}}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         <span class="">edit</span>
     </a>
     {% if not category_in_use %}
-    <a class="uk-button" href="{{url_for('delete_category_by_id', category_id=category.id )}}">
+    <a class="btn uk-button" href="{{url_for('delete_category_by_id', category_id=category.id )}}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
         <span class="">delete</span>
     </a>
@@ -32,7 +36,7 @@
 
 {% if authenticated %}
 <div class="">
-    <a class="uk-button" href="{{url_for('create_item', category_id=category.id )}}">
+    <a class="btn uk-button" href="{{url_for('create_item', category_id=category.id )}}">
         <i class="fa fa-plus" aria-hidden="true"></i>
         <span class="">new item</span>
     </a>
@@ -45,9 +49,9 @@
         <a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">
             <div class="uk-panel uk-panel-hover uk-panel-space">
 
-                <h3 class="uk-panel-title">{{ item.title }}</h2>
+                <h3 class="uk-panel-title user-content">{{ item.title }}</h2>
 
-                    <p>{{ item.description }}</p>
+                    <p class="user-content">{{ item.description }}</p>
 
                     <!--<a href="{{ url_for('update_item_by_id', category_id=category.id, item_id=item.id) }}">edit</a>-->
                     <!--<a href="{{ url_for('delete_item_by_id', category_id=category.id, item_id=item.id) }}">delete</a>-->
@@ -57,5 +61,7 @@
     </li>
     {% endfor %}
 </ul>
+    
+</main>
 
 {% endblock %}

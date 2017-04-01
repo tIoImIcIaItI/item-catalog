@@ -2,17 +2,21 @@
 {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
-<ul class="uk-breadcrumb">
-    <li class="uk-active"><a href="{{ url_for('get_categories') }}">Categories</a></li>
-</ul>
+<nav aria-label="breadcrumb" class="breadcrumbs">
+    <ol class="uk-breadcrumb" >
+        <li class="uk-active"><a href="#main" aria-current="page">Categories</a></li>
+    </ol>
+</nav>
 
+<main id="main">
+   
 <h1>Categories</h1>
 
 {% if authenticated %}
 <div class="">
-    <a class="uk-button" href="{{ url_for('create_category') }}">
+    <a class="btn uk-button" href="{{ url_for('create_category') }}">
         <i class="fa fa-plus"aria-hidden="true"></i>
-        <span class="">new category</span>
+        <span class="">New Category</span>
     </a>
 </div>
 {% endif %}
@@ -24,7 +28,7 @@
         <a href="{{ url_for('get_category_by_id', category_id=category.id) }}">
             <div class="uk-panel uk-panel-hover uk-panel-space">
 
-                <h2 uk-panel-title>{{category.name}}</h2>
+                <h2 class="user-content uk-panel-title">{{category.name}}</h2>
 
                 <!--<div class="uk-panel-badge uk-badge">42</div>-->
 
@@ -36,5 +40,7 @@
     </li>
     {% endfor %}
 </ul>
+    
+</main>
 
 {% endblock %}
