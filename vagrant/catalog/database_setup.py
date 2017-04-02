@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -15,6 +15,7 @@ class User(Base):
     picture = Column(String(250))
 
 
+# TODO: re-introduce owning user info to Category
 class Category(Base):
     __tablename__ = 'category'
 
@@ -53,10 +54,10 @@ class Item(Base):
         }
 
 
-engine = create_engine('sqlite:///itemcatalog.db')
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+# engine = create_engine('sqlite:///itemcatalog.db')
+# Base.metadata.create_all(engine)
+# DBSession = sessionmaker(bind=engine)
+# session = DBSession()
 
 # session.add(Category(name='Soccer'))
 # session.add(Category(name='Basketball'))

@@ -27,22 +27,30 @@
 </div>
 
 <!-- ITEM TOOLBAR -->
-{% if authenticated %}
+{% if authenticated and (can.update or can.delete) %}
+{% if can.update and can.delete %}
 <div class="uk-button-group">
+{% else %}
+<div class="">
+{% endif %}
 
+    {% if can.update %}
     <!-- EDIT ITEM -->
     <a class="btn uk-button" 
         href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         edit <span class="sr-only"> item {{ item.title }}</span>
     </a>
+    {% endif %}
 
+    {% if can.delete %}
     <!-- DELETE ITEM -->
     <a class="btn uk-button" 
         href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
         delete <span class="sr-only"> item {{ item.title }}</span>
     </a>
+    {% endif %}
 
 </div>
 {% endif %}

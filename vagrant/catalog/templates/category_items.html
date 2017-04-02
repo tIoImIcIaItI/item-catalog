@@ -16,21 +16,23 @@
 </h1>
 
 <!-- CATEGORY TOOLBAR -->
-{% if authenticated %}
-{% if category_in_use %}
-<div class="">
-{% else %}
+{% if authenticated and (can.update or can.delete) %}
+{% if can.update and can.delete %}
 <div class="uk-button-group">
+{% else %}
+<div class="">
 {% endif %}
 
+    {% if can.update %}
     <!-- EDIT CATEGORY -->
     <a class="btn uk-button" 
         href="{{ url_for('update_category_by_id', category_id=category.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         edit <span class="sr-only"> category {{category.name}}</span>
     </a>
+    {% endif %}
 
-    {% if not category_in_use %}
+    {% if can.delete %}
     <!-- DELETE CATEGORY -->
     <a class="btn uk-button" 
         href="{{ url_for('delete_category_by_id', category_id=category.id) }}">

@@ -13,6 +13,7 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
 from database_setup import Category, Item
+from permissions import Permissions
 from users import UserUtils
 
 Base = declarative_base()
@@ -87,7 +88,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id and \
-            'user_id' in login_session:
+                    'user_id' in login_session:
         return UserUtils.respond_with_preauthentication_url()
 
     # Store the access token in the session for later use.
@@ -241,8 +242,8 @@ def get_category_by_id(category_id):
         'category_items.html',
         category=category,
         items=items,
-        category_in_use=category_is_in_use(category.id),
-        page_title="%s Category" % category.name)
+        page_title="%s Category" % category.name,
+        can=Permissions.get_user_permissions_for_category(category))
 
 
 @app.route(
@@ -253,11 +254,14 @@ def update_category_by_id(category_id):
         UserUtils.set_preauthentication_url()
         return redirect('/login')
 
-    item = session.query(Category).filter_by(id=category_id).one()
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if not Permissions.get_user_permissions_for_category(category).update:
+        abort(403)
 
     if request.method == 'POST':
-        item.name = request.form['name']
-        session.add(item)
+        category.name = request.form['name']
+        session.add(category)
         session.commit()
 
         flash('category updated')
@@ -268,12 +272,8 @@ def update_category_by_id(category_id):
     else:
         return UserUtils.render_user_template(
             'category_update.html',
-            category=item,
-            page_title="%s %s Category" % ("Edit", item.name))
-
-
-def category_is_in_use(category_id):
-    return session.query(Item).filter_by(category_id=category_id).count()
+            category=category,
+            page_title="%s %s Category" % ("Edit", category.name))
 
 
 @app.route(
@@ -284,14 +284,13 @@ def delete_category_by_id(category_id):
         UserUtils.set_preauthentication_url()
         return redirect('/login')
 
-    # Cannot delete a category with items
-    if category_is_in_use(category_id):
+    category = session.query(Category).filter_by(id=category_id).one()
+
+    if not Permissions.get_user_permissions_for_category(category).delete:
         abort(403)
 
-    item = session.query(Category).filter_by(id=category_id).one()
-
     if request.method == 'POST':
-        session.delete(item)
+        session.delete(category)
         session.commit()
 
         flash('category deleted')
@@ -301,8 +300,8 @@ def delete_category_by_id(category_id):
     else:
         return UserUtils.render_user_template(
             'category_delete.html',
-            category=item,
-            page_title="%s %s Category" % ("Delete", item.name))
+            category=category,
+            page_title="%s %s Category" % ("Delete", category.name))
 
 
 # -----------------------------------------------------------------------------
@@ -407,7 +406,8 @@ def get_item_by_id(category_id, item_id):
         category=category,
         category_id=category_id,
         item=item,
-        page_title="%s Item" % item.title)
+        page_title="%s Item" % item.title,
+        can=Permissions.get_user_permissions_for_item(item))
 
 
 @app.route(
@@ -421,7 +421,7 @@ def update_item_by_id(category_id, item_id):
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may update only items they created
-    if item.user_id != UserUtils.get_authenticated_user_id():
+    if not Permissions.get_user_permissions_for_item(item).update:
         flash('You may edit only items you created')
         abort(403)
 
@@ -458,7 +458,7 @@ def delete_item_by_id(category_id, item_id):
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may delete only items they created
-    if item.user_id != UserUtils.get_authenticated_user_id():
+    if not Permissions.get_user_permissions_for_item(item).delete:
         flash('You may delete only items you created')
         abort(403)
 
