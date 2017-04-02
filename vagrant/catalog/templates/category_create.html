@@ -26,10 +26,13 @@
 
         <button class="uk-button uk-button-primary" type='submit' >
             <i class="fa fa-plus" aria-hidden="true"></i>
-            create
+            create <span class="sr-only"> new category</span>
         </button>
     
-        <a class="uk-button uk-button-mini" href="{{ url_for('get_categories') }}">cancel</a>
+        <a class="uk-button uk-button-mini" 
+            href="{{ url_for('get_categories') }}">
+            cancel
+        </a>
 
     </fieldset>
 

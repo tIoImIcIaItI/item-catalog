@@ -34,14 +34,14 @@
     <a class="btn uk-button" 
         href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
-        <span class="">edit</span>
+        edit <span class="sr-only"> item {{ item.title }}</span>
     </a>
 
     <!-- DELETE ITEM -->
     <a class="btn uk-button" 
         href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
-        <span class="">delete</span>
+        delete <span class="sr-only"> item {{ item.title }}</span>
     </a>
 
 </div>

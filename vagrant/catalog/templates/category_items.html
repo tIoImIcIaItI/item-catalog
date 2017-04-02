@@ -27,15 +27,15 @@
     <a class="btn uk-button" 
         href="{{ url_for('update_category_by_id', category_id=category.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
-        <span class="">edit</span>
+        edit <span class="sr-only"> category {{category.name}}</span>
     </a>
 
     {% if not category_in_use %}
     <!-- DELETE CATEGORY -->
     <a class="btn uk-button" 
         href="{{ url_for('delete_category_by_id', category_id=category.id) }}">
-        <i class="fa fa-trash-o"aria-hidden="true"></i>
-        <span class="">delete</span>
+        <i class="fa fa-trash-o" aria-hidden="true"></i>
+        delete <span class="sr-only"> category {{category.name}}</span>
     </a>
     {% endif %}
 
@@ -48,9 +48,10 @@
 <!-- ITEMS TOOLBAR -->
 {% if authenticated %}
 <div class="">
-    <a class="btn uk-button" href="{{ url_for('create_item', category_id=category.id) }}">
+    <a class="btn uk-button" 
+        href="{{ url_for('create_item', category_id=category.id) }}">
         <i class="fa fa-plus" aria-hidden="true"></i>
-        <span class="">new item</span>
+        <span class="">New Item</span>
     </a>
 </div>
 {% endif %}

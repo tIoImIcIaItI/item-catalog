@@ -25,10 +25,13 @@
         
         <button class="uk-button uk-button-primary uk-button-danger" type='submit' >
             <i class="fa fa-trash-o" aria-hidden="true"></i>
-            delete
+            delete <span class="sr-only"> item {{ item.title }}</span>
         </button>
         
-        <a class="uk-button uk-button-mini" href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">cancel</a>
+        <a class="uk-button uk-button-mini" 
+            href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">
+            cancel
+        </a>
 
     </fieldset>
 
