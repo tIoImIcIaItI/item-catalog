@@ -10,21 +10,40 @@
 </nav>
 
 <main id="main">
-   
-<h1 class="user-content">{{item.title}}</h1>
 
-<p class="user-content">{{item.description}}</p>
+<!-- ITEM PROPERTIES -->
+<div itemscope itemtype="http://schema.org/Product">
 
+    <meta itemprop="category" content="{{category.name}}" />
+
+    <h1 itemprop="name" class="user-content">
+        {{item.title}}
+    </h1>
+
+    <p itemprop="description" class="user-content">
+        {{item.description}}
+    </p>
+
+</div>
+
+<!-- ITEM TOOLBAR -->
 {% if authenticated %}
 <div class="uk-button-group">
-    <a class="btn uk-button" href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
+
+    <!-- EDIT ITEM -->
+    <a class="btn uk-button" 
+        href="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         <span class="">edit</span>
     </a>
-    <a class="btn uk-button" href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
+
+    <!-- DELETE ITEM -->
+    <a class="btn uk-button" 
+        href="{{ url_for('delete_item_by_id', category_id=category_id, item_id=item.id) }}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
         <span class="">delete</span>
     </a>
+
 </div>
 {% endif %}
     

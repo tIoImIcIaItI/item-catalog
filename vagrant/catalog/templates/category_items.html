@@ -11,53 +11,72 @@
 <main id="main">
    
 <!-- CATEGORY -->
-<h1 class="user-content">{{category.name}}</h1>
+<h1 class="user-content">
+    {{category.name}}
+</h1>
+
+<!-- CATEGORY TOOLBAR -->
 {% if authenticated %}
 {% if category_in_use %}
 <div class="">
 {% else %}
 <div class="uk-button-group">
 {% endif %}
-    <a class="btn uk-button" href="{{url_for('update_category_by_id', category_id=category.id )}}">
+
+    <!-- EDIT CATEGORY -->
+    <a class="btn uk-button" 
+        href="{{ url_for('update_category_by_id', category_id=category.id) }}">
         <i class="fa fa-pencil" aria-hidden="true"></i>
         <span class="">edit</span>
     </a>
+
     {% if not category_in_use %}
-    <a class="btn uk-button" href="{{url_for('delete_category_by_id', category_id=category.id )}}">
+    <!-- DELETE CATEGORY -->
+    <a class="btn uk-button" 
+        href="{{ url_for('delete_category_by_id', category_id=category.id) }}">
         <i class="fa fa-trash-o"aria-hidden="true"></i>
         <span class="">delete</span>
     </a>
     {% endif %}
+
 </div>
 {% endif %}
 
 <!-- ITEMS -->
 <h2>Items</h2>
 
+<!-- ITEMS TOOLBAR -->
 {% if authenticated %}
 <div class="">
-    <a class="btn uk-button" href="{{url_for('create_item', category_id=category.id )}}">
+    <a class="btn uk-button" href="{{ url_for('create_item', category_id=category.id) }}">
         <i class="fa fa-plus" aria-hidden="true"></i>
         <span class="">new item</span>
     </a>
 </div>
 {% endif %}
 
+<!-- ITEM LIST -->
 <ul class="uk-grid uk-grid-small" data-uk-grid-match data-uk-observe>
     {% for item in items %}
-    <li class="uk-width-large-1-3 uk-width-medium-1-2 uk-width-small-1-1">
-        <a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">
-            <div class="uk-panel uk-panel-hover uk-panel-space">
+    <li itemscope itemtype="http://schema.org/Product"
+        class="uk-width-large-1-3 uk-width-medium-1-2 uk-width-small-1-1">
 
-                <h3 class="uk-panel-title user-content">{{ item.title }}</h2>
+        <meta itemprop="category" content="{{category.name}}" />
 
-                    <p class="user-content">{{ item.description }}</p>
+        <div class="uk-panel uk-panel-hover uk-panel-space">
 
-                    <!--<a href="{{ url_for('update_item_by_id', category_id=category.id, item_id=item.id) }}">edit</a>-->
-                    <!--<a href="{{ url_for('delete_item_by_id', category_id=category.id, item_id=item.id) }}">delete</a>-->
+            <h3 itemprop="name" class="uk-panel-title user-content">
+                <a href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">
+                    {{ item.title }}
+                </a>
+            </h2>
 
-            </div>
-        </a>
+            <p itemprop="description" class="user-content">
+                {{ item.description }}
+            </p>
+
+        </div>
+
     </li>
     {% endfor %}
 </ul>
