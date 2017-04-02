@@ -12,7 +12,8 @@ from sqlalchemy.orm import sessionmaker
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 
-from database_setup import Category, Item, User
+from database_setup import Category, Item
+from users import UserUtils
 
 Base = declarative_base()
 engine = create_engine('sqlite:///itemcatalog.db')
@@ -28,61 +29,6 @@ app = Flask(__name__)
 CLIENT_ID = \
     json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Item Catalog"
-
-
-def render_user_template(template_name_or_list, **kwargs):
-    authenticated = is_authenticated()
-
-    if 'authenticated' not in kwargs:
-        kwargs['authenticated'] = authenticated
-
-    if 'user_handle' not in kwargs:
-        if authenticated:
-            kwargs['handle'] = get_user_handle()
-
-    return render_template(template_name_or_list, **kwargs)
-
-
-def get_user_handle():
-    if not is_authenticated():
-        return None
-
-    return \
-        login_session['username'] \
-            if 'username' in login_session and len(
-            login_session['username']) > 0 \
-            else login_session['email']
-
-
-def unset_preauthentication_url():
-    del login_session['return-to-url']
-
-
-def set_preauthentication_url():
-    login_session['return-to-url'] = request.referrer
-
-
-def get_preauthentication_url():
-    if 'return-to-url' in login_session:
-        url = login_session.get('return-to-url')
-        if url:
-            return url
-
-    return '/'
-
-
-def respond_with_preauthentication_url():
-    response = make_response(
-        json.dumps({'redirect': get_preauthentication_url()}),
-        200)
-    response.headers['Content-Type'] = 'application/json'
-    return response
-
-
-def return_to_preauthentication_url():
-    url = get_preauthentication_url()
-    unset_preauthentication_url()
-    return redirect(url)
 
 
 @app.route(
@@ -141,8 +87,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id and \
-                    'user_id' in login_session:
-        return respond_with_preauthentication_url()
+            'user_id' in login_session:
+        return UserUtils.respond_with_preauthentication_url()
 
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
@@ -163,28 +109,28 @@ def gconnect():
 
     # Either create or retrieve the associated User
     # from the data store, by unique email
-    user = try_get_user_by_email(data['email'])
+    user = UserUtils.try_get_user_by_email(data['email'])
     if not user:
-        user = create_user(login_session)
+        user = UserUtils.create_user(login_session)
     user_id = user.id
     login_session['user_id'] = user_id
 
-    handle = get_user_handle()
+    handle = UserUtils.get_user_handle()
 
     flash("you are now logged in as %s" % handle)
     print "done!"
 
-    return respond_with_preauthentication_url()
+    return UserUtils.respond_with_preauthentication_url()
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route(
     '/gdisconnect')
 def gdisconnect():
-    set_preauthentication_url()
+    UserUtils.set_preauthentication_url()
 
     if 'access_token' not in login_session:
-        return return_to_preauthentication_url()
+        return UserUtils.return_to_preauthentication_url()
 
     access_token = login_session['access_token']
 
@@ -224,21 +170,17 @@ def gdisconnect():
     # response.headers['Content-Type'] = 'application/json'
     # return response
 
-    return return_to_preauthentication_url()
-
-
-def is_authenticated():
-    return 'user_id' in login_session
+    return UserUtils.return_to_preauthentication_url()
 
 
 @app.route(
     '/login')
 def get_login_page():
-    set_preauthentication_url()
+    UserUtils.set_preauthentication_url()
 
     # Create anti-forgery state token
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in range(32))
+                    for _ in range(32))
 
     login_session['state'] = state
 
@@ -248,38 +190,6 @@ def get_login_page():
         STATE=state)
 
 
-def create_user(fields):
-    """
-    :rtype: User
-    """
-    user = User(
-        name=fields['username'],
-        email=fields['email'],
-        picture=fields['picture'])
-    session.add(user)
-    session.commit()
-
-    return session.query(User).filter_by(email=fields['email']).one()
-
-
-def try_get_user_by_email(email):
-    """
-    :type email: String
-    :rtype: User
-    """
-    try:
-        return session.query(User).filter_by(email=email).one()
-    except:
-        return None
-
-
-def get_authenticated_user_id():
-    if 'user_id' in login_session:
-        return login_session['user_id']
-    else:
-        return None
-
-
 # -----------------------------------------------------------------------------
 # CATEGORY HTML ENDPOINTS
 
@@ -287,8 +197,8 @@ def get_authenticated_user_id():
     '/categories/create',
     methods=['GET', 'POST'])
 def create_category():
-    if not is_authenticated():
-        set_preauthentication_url()
+    if not UserUtils.is_authenticated():
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     if request.method == 'POST':
@@ -304,7 +214,7 @@ def create_category():
             'get_category_by_id',
             category_id=item.id))
     else:
-        return render_user_template(
+        return UserUtils.render_user_template(
             'category_create.html',
             page_title="New Category")
 
@@ -314,7 +224,7 @@ def create_category():
 def get_categories():
     items = session.query(Category).all()
 
-    return render_user_template(
+    return UserUtils.render_user_template(
         'category_list.html',
         categories=items,
         page_title="Category List")
@@ -327,7 +237,7 @@ def get_category_by_id(category_id):
 
     items = session.query(Item).filter_by(category_id=category_id).all()
 
-    return render_user_template(
+    return UserUtils.render_user_template(
         'category_items.html',
         category=category,
         items=items,
@@ -339,8 +249,8 @@ def get_category_by_id(category_id):
     '/categories/<int:category_id>/update',
     methods=['GET', 'POST'])
 def update_category_by_id(category_id):
-    if not is_authenticated():
-        set_preauthentication_url()
+    if not UserUtils.is_authenticated():
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Category).filter_by(id=category_id).one()
@@ -356,7 +266,7 @@ def update_category_by_id(category_id):
             'get_category_by_id',
             category_id=category_id))
     else:
-        return render_user_template(
+        return UserUtils.render_user_template(
             'category_update.html',
             category=item,
             page_title="%s %s Category" % ("Edit", item.name))
@@ -370,8 +280,8 @@ def category_is_in_use(category_id):
     '/categories/<int:category_id>/delete',
     methods=['GET', 'POST'])
 def delete_category_by_id(category_id):
-    if not is_authenticated():
-        set_preauthentication_url()
+    if not UserUtils.is_authenticated():
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     # Cannot delete a category with items
@@ -389,7 +299,7 @@ def delete_category_by_id(category_id):
         return redirect(url_for(
             'get_categories'))
     else:
-        return render_user_template(
+        return UserUtils.render_user_template(
             'category_delete.html',
             category=item,
             page_title="%s %s Category" % ("Delete", item.name))
@@ -456,9 +366,9 @@ def api_get_category(category_id):
     '/categories/<int:category_id>/items/create',
     methods=['GET', 'POST'])
 def create_item(category_id):
-    if not is_authenticated():
+    if not UserUtils.is_authenticated():
         flash('login to create an item')
-        set_preauthentication_url()
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     if request.method == 'POST':
@@ -467,7 +377,7 @@ def create_item(category_id):
             title=request.form['title'],
             description=request.form['description'],
             category_id=category_id,
-            user_id=get_authenticated_user_id())
+            user_id=UserUtils.get_authenticated_user_id())
         session.add(item)
         session.commit()
 
@@ -479,7 +389,7 @@ def create_item(category_id):
     else:
         category = session.query(Category).filter_by(id=category_id).one()
 
-        return render_user_template(
+        return UserUtils.render_user_template(
             'item_create.html',
             category=category,
             category_id=category_id)
@@ -492,7 +402,7 @@ def get_item_by_id(category_id, item_id):
 
     item = session.query(Item).filter_by(id=item_id).one()
 
-    return render_user_template(
+    return UserUtils.render_user_template(
         'item_read.html',
         category=category,
         category_id=category_id,
@@ -504,14 +414,14 @@ def get_item_by_id(category_id, item_id):
     '/categories/<int:category_id>/items/<int:item_id>/edit',
     methods=['GET', 'POST'])
 def update_item_by_id(category_id, item_id):
-    if not is_authenticated():
-        set_preauthentication_url()
+    if not UserUtils.is_authenticated():
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may update only items they created
-    if item.user_id != get_authenticated_user_id():
+    if item.user_id != UserUtils.get_authenticated_user_id():
         flash('You may edit only items you created')
         abort(403)
 
@@ -529,7 +439,7 @@ def update_item_by_id(category_id, item_id):
     else:
         category = session.query(Category).filter_by(id=category_id).one()
 
-        return render_user_template(
+        return UserUtils.render_user_template(
             'item_update.html',
             category=category,
             category_id=category_id,
@@ -541,14 +451,14 @@ def update_item_by_id(category_id, item_id):
     '/categories/<int:category_id>/items/<int:item_id>/delete',
     methods=['GET', 'POST'])
 def delete_item_by_id(category_id, item_id):
-    if not is_authenticated():
-        set_preauthentication_url()
+    if not UserUtils.is_authenticated():
+        UserUtils.set_preauthentication_url()
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may delete only items they created
-    if item.user_id != get_authenticated_user_id():
+    if item.user_id != UserUtils.get_authenticated_user_id():
         flash('You may delete only items you created')
         abort(403)
 
@@ -564,7 +474,7 @@ def delete_item_by_id(category_id, item_id):
     else:
         category = session.query(Category).filter_by(id=category_id).one()
 
-        return render_user_template(
+        return UserUtils.render_user_template(
             'item_delete.html',
             category=category,
             category_id=category_id,
