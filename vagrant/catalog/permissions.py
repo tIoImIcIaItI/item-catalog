@@ -1,13 +1,6 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from database_setup import Item
+from database_setup import Item, DBSession
 from users import UserUtils
 
-Base = declarative_base()
-engine = create_engine('sqlite:///itemcatalog.db')
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
@@ -24,17 +17,13 @@ class Permissions(object):
         :param category: Category 
         :rtype: Permissions
         """
-
-        def category_is_in_use(category_id):
-            return session.query(Item).filter_by(
-                category_id=category_id).count()
-
-        belongs_to_user = True
-        # TODO: re-introduce owning user fields to Category
-        # category.user_id == UserUtils.get_authenticated_user_id()
+        belongs_to_user = \
+            category.user_id == UserUtils.get_authenticated_user_id()
 
         is_in_use = \
-            category_is_in_use(category.id)
+            session.query(Item). \
+            filter_by(category_id=category.id). \
+            count()
 
         return Permissions(
             create=True,

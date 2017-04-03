@@ -2,16 +2,9 @@ import json
 
 from flask import make_response, redirect, render_template, request, \
     session as login_session
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
-from database_setup import User
+from database_setup import User, DBSession
 
-Base = declarative_base()
-engine = create_engine('sqlite:///itemcatalog.db')
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 

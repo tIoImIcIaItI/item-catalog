@@ -1,25 +1,19 @@
+import json
 import random
 import string
-import json
+
 import httplib2
 import requests
 from flask import Flask, render_template, request, url_for, flash, jsonify, \
     redirect, make_response, abort
 from flask import session as login_session
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
+from oauth2client.client import flow_from_clientsecrets
 
-from database_setup import Category, Item
+from database_setup import Category, Item, DBSession
 from permissions import Permissions
 from users import UserUtils
 
-Base = declarative_base()
-engine = create_engine('sqlite:///itemcatalog.db')
-Base.metadata.create_all(engine)
-DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 app = Flask(__name__)
@@ -315,6 +309,7 @@ def api_get_categories():
     def serialize(c):
         return {
             'id': c.id,
+            'user_id': c.user_id,
             'name': c.name,
             'items_url': url_for(
                 'api_get_items_by_category_id', category_id=c.id)
@@ -350,6 +345,7 @@ def api_get_category(category_id):
     def serialize(c):
         return {
             'id': c.id,
+            'user_id': c.user_id,
             'name': c.name,
             'items': items
         }
