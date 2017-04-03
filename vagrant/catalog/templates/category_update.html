@@ -19,10 +19,21 @@
     method="POST">
 
     <fieldset class="uk-form-row">
+
         <label class="uk-form-label" for="name">Name</label>
-        <input type="text" size="30" id="name" name="name" 
+
+        <input class="{{ 'uk-form-danger' if name_error else '' }}" 
+            type="text" size="30" id="name" name="name" 
+            maxlength="80" minlength="2" required aria-required="true"
             placeholder="category name" value="{{ name or '' }}">
-        <div class="uk-form-danger">{{ name_error or '' }}</div>
+
+        <div class="uk-text-danger" id="name_error">
+            {% if name_error %}
+            <!--<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>-->
+            {{ name_error }}
+            {% endif %}
+        </div>
+
     </fieldset>
 
     <fieldset>
