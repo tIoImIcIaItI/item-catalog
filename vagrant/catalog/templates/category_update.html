@@ -16,17 +16,18 @@
 
 <form class="uk-form uk-form-stacked" data-uk-margin
     action="{{ url_for('update_category_by_id', category_id=category.id) }}" 
-    method='POST'>
+    method="POST">
 
     <fieldset class="uk-form-row">
         <label class="uk-form-label" for="name">Name</label>
-        <input type='text' size='30' id="name" name='name' 
-            placeholder='{{ category.name }}' value='{{ category.name or ""}}'>
+        <input type="text" size="30" id="name" name="name" 
+            placeholder="category name" value="{{ name or '' }}">
+        <div class="uk-form-danger">{{ name_error or '' }}</div>
     </fieldset>
 
     <fieldset>
         
-        <button class="uk-button uk-button-primary" type='submit' >
+        <button class="uk-button uk-button-primary" type="submit" >
             <i class="fa fa-pencil" aria-hidden="true"></i>
             save <span class="sr-only"> category {{ category.name }}</span>
         </button>

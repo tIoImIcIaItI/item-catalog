@@ -188,6 +188,18 @@ def get_login_page():
 # -----------------------------------------------------------------------------
 # CATEGORY HTML ENDPOINTS
 
+def extract_and_validate_category_name(form):
+    name = form.get('name')
+    name_error = None
+
+    if not name:
+        name_error = 'Name is required'
+    elif len(name) < 2 or len(name) > 80:
+        name_error = 'Name must be between 2 and 80 characters'
+
+    return name, name_error
+
+
 @app.route(
     '/categories/create',
     methods=['GET', 'POST'])
@@ -198,8 +210,21 @@ def create_category():
 
     if request.method == 'POST':
 
+        # Extract and validate the form inputs
+        (name, name_error) = \
+            extract_and_validate_category_name(request.form)
+
+        if name_error:
+            return UserUtils.render_user_template(
+                'category_create.html',
+                page_title="New Category",
+                name=name, name_error=name_error)
+
+        # Create the item in the data store
+
         item = Category(
-            name=request.form['name'])
+            name=name,
+            user_id=UserUtils.get_authenticated_user_id())
         session.add(item)
         session.commit()
 
@@ -254,7 +279,21 @@ def update_category_by_id(category_id):
         abort(403)
 
     if request.method == 'POST':
-        category.name = request.form['name']
+        # Extract and validate the form inputs
+        (name, name_error) = \
+            extract_and_validate_category_name(request.form)
+
+        if name_error:
+            return UserUtils.render_user_template(
+                'category_update.html',
+                category=category,
+                page_title="%s %s Category" % ("Edit", category.name),
+                name=name,
+                name_error=name_error)
+
+        # Create the item in the data store
+
+        category.name = name
         session.add(category)
         session.commit()
 
@@ -267,7 +306,8 @@ def update_category_by_id(category_id):
         return UserUtils.render_user_template(
             'category_update.html',
             category=category,
-            page_title="%s %s Category" % ("Edit", category.name))
+            page_title="%s %s Category" % ("Edit", category.name),
+            name=category.name)
 
 
 @app.route(
@@ -357,6 +397,30 @@ def api_get_category(category_id):
 # -----------------------------------------------------------------------------
 # ITEM HTML ENDPOINTS
 
+def extract_and_validate_item_title(form):
+    title = form.get('title')
+    title_error = None
+
+    if not title:
+        title_error = 'Title is required'
+    elif len(title) < 2 or len(title) > 80:
+        title_error = 'Title must be between 2 and 80 characters'
+
+    return title, title_error
+
+
+def extract_and_validate_item_description(form):
+    description = form.get('description')
+    description_error = None
+
+    if not description:
+        description_error = 'Description is required'
+    elif len(description) < 2 or len(description) > 80:
+        description_error = 'Description must be between 2 and 250 characters'
+
+    return description, description_error
+
+
 @app.route(
     '/categories/<int:category_id>/items/create',
     methods=['GET', 'POST'])
@@ -366,11 +430,33 @@ def create_item(category_id):
         UserUtils.set_preauthentication_url()
         return redirect('/login')
 
+    category = \
+        session.query(Category).filter_by(id=category_id).one()
+
     if request.method == 'POST':
+        # Extract and validate the form inputs
+
+        (title, title_error) = \
+            extract_and_validate_item_title(request.form)
+
+        (description, description_error) = \
+            extract_and_validate_item_description(request.form)
+
+        if title_error or description_error:
+            return UserUtils.render_user_template(
+                'item_create.html',
+                category=category,
+                category_id=category_id,
+                title=title,
+                title_error=title_error,
+                description=description,
+                description_error=description_error)
+
+        # Create the item in the data store
 
         item = Item(
-            title=request.form['title'],
-            description=request.form['description'],
+            title=title,
+            description=description,
             category_id=category_id,
             user_id=UserUtils.get_authenticated_user_id())
         session.add(item)
@@ -382,8 +468,6 @@ def create_item(category_id):
             'get_category_by_id',
             category_id=category_id))
     else:
-        category = session.query(Category).filter_by(id=category_id).one()
-
         return UserUtils.render_user_template(
             'item_create.html',
             category=category,
@@ -421,9 +505,33 @@ def update_item_by_id(category_id, item_id):
         flash('You may edit only items you created')
         abort(403)
 
+    category = session.query(Category).filter_by(id=category_id).one()
+
     if request.method == 'POST':
-        item.title = request.form['title']
-        item.description = request.form['description']
+        # Extract and validate the form inputs
+
+        (title, title_error) = \
+            extract_and_validate_item_title(request.form)
+
+        (description, description_error) = \
+            extract_and_validate_item_description(request.form)
+
+        if title_error or description_error:
+            return UserUtils.render_user_template(
+                'item_update.html',
+                category=category,
+                category_id=category_id,
+                item=item,
+                page_title="%s %s Item" % ("Edit", item.title),
+                title=title,
+                title_error=title_error,
+                description=description,
+                description_error=description_error)
+
+        # Create the item in the data store
+
+        item.title = title
+        item.description = description
         session.add(item)
         session.commit()
 
@@ -433,14 +541,14 @@ def update_item_by_id(category_id, item_id):
             'get_category_by_id',
             category_id=category_id))
     else:
-        category = session.query(Category).filter_by(id=category_id).one()
-
         return UserUtils.render_user_template(
             'item_update.html',
             category=category,
             category_id=category_id,
             item=item,
-            page_title="%s %s Item" % ("Edit", item.title))
+            page_title="%s %s Item" % ("Edit", item.title),
+            title=item.title,
+            description=item.description)
 
 
 @app.route(

@@ -20,12 +20,16 @@
 
     <fieldset class="uk-form-row">
         <label class="uk-form-label" for="title">Title</label>
-        <input type='text' size='30' id='title' name='title'>
+        <input type="text" size="30" id="title" name="title" 
+            placeholder="item title" value="{{ title or ''}}">
+        <div class="uk-form-danger">{{ title_error or '' }}</div>
     </fieldset>
 
     <fieldset class="uk-form-row">
         <label class="uk-form-label" for="description">Description</label>
-        <input type='text' size='30' id='description' name='description'>
+        <input type="text" size="30" id="description" name="description" 
+            placeholder="item description" value="{{ description or '' }}">
+        <div class="uk-form-danger">{{ description_error or ''}}</div>
     </fieldset>
 
     <fieldset class="uk-form-row">

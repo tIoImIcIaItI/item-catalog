@@ -19,7 +19,9 @@
 
     <fieldset class="uk-form-row">
         <label class="uk-form-label" for="name">Name</label>
-        <input type='text' size='30' id='name' name='name'>
+        <input type="text" size="30" id="name" name="name"
+            placeholder="category name" value="{{ name or '' }}">
+        <div class="uk-form-danger">{{ name_error or '' }}</div>
     </fieldset>
 
     <fieldset class="uk-form-row">
