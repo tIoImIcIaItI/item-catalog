@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% block content %}
 
 <!-- BREADCRUMB WIDGET -->
@@ -12,27 +12,27 @@
 </nav>
 
 <main id="main">
-   
+
 <h1>Edit {{ item.title }}</h1>
 
 <form  id="item-form"
     class="uk-form uk-form-stacked" data-uk-margin
-    action="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}" 
+    action="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}"
     method="POST">
 
     <fieldset class="uk-form-row">
 
         <label class="uk-form-label" for="title">Title</label>
-        
-        <input class="{{ 'uk-form-danger' if title_error else '' }}" 
+
+        <input class="{{ 'uk-form-danger' if title_error else '' }}"
             data-autofocus
-            type="text" size="30" id="title" name="title" 
+            type="text" size="30" id="title" name="title"
             maxlength="80" minlength="2" required aria-required="true"
             placeholder="item title" value="{{ title or ''}}">
 
-        <div id="title-error" data-error-for="title" 
+        <div id="title-error" data-error-for="title"
             class="validation-error uk-text-danger invisible"></div>
-        
+
         <div class="uk-text-danger">
             {% if title_error %}
             {{ title_error }}
@@ -45,12 +45,12 @@
 
         <label class="uk-form-label" for="description">Description</label>
 
-        <input class="{{ 'uk-form-danger' if description_error else '' }}" 
-            type="text" size="30" id="description" name="description" 
+        <input class="{{ 'uk-form-danger' if description_error else '' }}"
+            type="text" size="30" id="description" name="description"
             maxlength="250" minlength="2" required aria-required="true"
             placeholder="item description" value="{{ description or '' }}">
 
-        <div id="description-error" data-error-for="description" 
+        <div id="description-error" data-error-for="description"
             class="validation-error uk-text-danger invisible"></div>
 
         <div class="uk-text-danger">
@@ -58,31 +58,31 @@
             {{ description_error }}
             {% endif %}
         </div>
-        
+
     </fieldset>
 
     <br/>
 
     <fieldset>
-        
+
         <button class="uk-button uk-button-primary" type='submit' >
             <i class="fa fa-pencil" aria-hidden="true"></i>
             save <span class="sr-only"> item {{ item.title }}</span>
         </button>
 
-        <a class="uk-button uk-button-mini" 
+        <a class="uk-button uk-button-mini"
             href="{{ url_for('get_item_by_id', category_id=category.id, item_id=item.id) }}">
             cancel
-        </a> 
+        </a>
 
     </fieldset>
 
 </form>
-    
+
 </main>
 
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/itemformviewmodel.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app/itemformviewmodel.js') }}"></script>
 {% endblock %}
