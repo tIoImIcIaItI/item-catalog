@@ -30,6 +30,9 @@ APPLICATION_NAME = "Item Catalog"
     '/gconnect',
     methods=['POST'])
 def gconnect():
+    """
+    Initiates user authentication via Google
+    """
     # Validate state token
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -118,10 +121,12 @@ def gconnect():
     return UserUtils.respond_with_preauthentication_url()
 
 
-# DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route(
     '/gdisconnect')
 def gdisconnect():
+    """
+    Revokes a current Google user's token and resets their login_session
+    """
     UserUtils.set_preauthentication_url()
 
     if 'access_token' not in login_session:
@@ -171,6 +176,10 @@ def gdisconnect():
 @app.route(
     '/login')
 def get_login_page():
+    """
+    Presents the user with the available authentication services, and
+    creates a unique token
+    """
     UserUtils.set_preauthentication_url()
 
     # Create anti-forgery state token
@@ -179,7 +188,6 @@ def get_login_page():
 
     login_session['state'] = state
 
-    # return "The current session state is %s" % login_session['state']
     return render_template(
         'login.html',
         STATE=state)
@@ -189,6 +197,9 @@ def get_login_page():
 # CATEGORY HTML ENDPOINTS
 
 def extract_and_validate_category_name(form):
+    """
+    :rtype: (String, String) 
+    """
     name = form.get('name')
     name_error = None
 
@@ -204,8 +215,12 @@ def extract_and_validate_category_name(form):
     '/categories/create',
     methods=['GET', 'POST'])
 def create_category():
+    """
+    HTML endpoint providing a form to create a new category
+    """
     if not UserUtils.is_authenticated():
         UserUtils.set_preauthentication_url()
+        flash('sign in to create categories')
         return redirect('/login')
 
     if request.method == 'POST':
@@ -242,6 +257,9 @@ def create_category():
 @app.route('/')
 @app.route('/categories/')
 def get_categories():
+    """
+    HTML endpoint providing a list of all categories
+    """
     items = session.query(Category).all()
 
     return UserUtils.render_user_template(
@@ -253,6 +271,9 @@ def get_categories():
 @app.route(
     '/categories/<int:category_id>/')
 def get_category_by_id(category_id):
+    """
+    HTML endpoint providing details for a given category
+    """
     category = session.query(Category).filter_by(id=category_id).one()
 
     items = session.query(Item).filter_by(category_id=category_id).all()
@@ -269,14 +290,20 @@ def get_category_by_id(category_id):
     '/categories/<int:category_id>/update',
     methods=['GET', 'POST'])
 def update_category_by_id(category_id):
+    """
+    HTML endpoint providing a form to edit a category
+    """
     if not UserUtils.is_authenticated():
         UserUtils.set_preauthentication_url()
+        flash('sign in to edit categories')
         return redirect('/login')
 
     category = session.query(Category).filter_by(id=category_id).one()
 
     if not Permissions.get_user_permissions_for_category(category).update:
-        abort(403)
+        flash('you may edit only categories you created')
+        return redirect(url_for(
+            'get_categories'))
 
     if request.method == 'POST':
         # Extract and validate the form inputs
@@ -314,14 +341,20 @@ def update_category_by_id(category_id):
     '/categories/<int:category_id>/delete',
     methods=['GET', 'POST'])
 def delete_category_by_id(category_id):
+    """
+    HTML endpoint providing a form to delete a category
+    """
     if not UserUtils.is_authenticated():
         UserUtils.set_preauthentication_url()
+        flash('sign in to delete categories')
         return redirect('/login')
 
     category = session.query(Category).filter_by(id=category_id).one()
 
     if not Permissions.get_user_permissions_for_category(category).delete:
-        abort(403)
+        flash('you may delete only categories you created')
+        return redirect(url_for(
+            'get_categories'))
 
     if request.method == 'POST':
         session.delete(category)
@@ -344,6 +377,9 @@ def delete_category_by_id(category_id):
 @app.route(
     '/api/categories/')
 def api_get_categories():
+    """
+    API endpoint providing a list of all categories
+    """
     categories = session.query(Category).all()
 
     def serialize(c):
@@ -362,6 +398,9 @@ def api_get_categories():
 @app.route(
     '/api/categories/<int:category_id>/')
 def api_get_category(category_id):
+    """
+    API endpoint providing details for a given category
+    """
     category = \
         session.query(Category).filter_by(id=category_id).one()
 
@@ -398,6 +437,9 @@ def api_get_category(category_id):
 # ITEM HTML ENDPOINTS
 
 def extract_and_validate_item_title(form):
+    """
+    :rtype: (String, String) 
+    """
     title = form.get('title')
     title_error = None
 
@@ -410,6 +452,9 @@ def extract_and_validate_item_title(form):
 
 
 def extract_and_validate_item_description(form):
+    """
+    :rtype: (String, String) 
+    """
     description = form.get('description')
     description_error = None
 
@@ -425,9 +470,12 @@ def extract_and_validate_item_description(form):
     '/categories/<int:category_id>/items/create',
     methods=['GET', 'POST'])
 def create_item(category_id):
+    """
+    HTML endpoint providing a form to create a new item within a category
+    """
     if not UserUtils.is_authenticated():
-        flash('login to create an item')
         UserUtils.set_preauthentication_url()
+        flash('sign in to create an item')
         return redirect('/login')
 
     category = \
@@ -477,6 +525,9 @@ def create_item(category_id):
 @app.route(
     '/categories/<int:category_id>/items/<int:item_id>/')
 def get_item_by_id(category_id, item_id):
+    """
+    HTML endpoint providing details for a given item within a category
+    """
     category = session.query(Category).filter_by(id=category_id).one()
 
     item = session.query(Item).filter_by(id=item_id).one()
@@ -494,16 +545,22 @@ def get_item_by_id(category_id, item_id):
     '/categories/<int:category_id>/items/<int:item_id>/edit',
     methods=['GET', 'POST'])
 def update_item_by_id(category_id, item_id):
+    """
+    HTML endpoint providing a form to edit an item
+    """
     if not UserUtils.is_authenticated():
         UserUtils.set_preauthentication_url()
+        flash('sign in to edit an item')
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may update only items they created
     if not Permissions.get_user_permissions_for_item(item).update:
-        flash('You may edit only items you created')
-        abort(403)
+        flash('you may edit only items you created')
+        return redirect(url_for(
+            'get_category_by_id',
+            category_id=category_id))
 
     category = session.query(Category).filter_by(id=category_id).one()
 
@@ -555,16 +612,22 @@ def update_item_by_id(category_id, item_id):
     '/categories/<int:category_id>/items/<int:item_id>/delete',
     methods=['GET', 'POST'])
 def delete_item_by_id(category_id, item_id):
+    """
+    HTML endpoint providing a form to delete an item
+    """
     if not UserUtils.is_authenticated():
         UserUtils.set_preauthentication_url()
+        flash('sign in to delete an item')
         return redirect('/login')
 
     item = session.query(Item).filter_by(id=item_id).one()
 
     # Users may delete only items they created
     if not Permissions.get_user_permissions_for_item(item).delete:
-        flash('You may delete only items you created')
-        abort(403)
+        flash('you may delete only items you created')
+        return redirect(url_for(
+            'get_category_by_id',
+            category_id=category_id))
 
     if request.method == 'POST':
         session.delete(item)
@@ -592,6 +655,9 @@ def delete_item_by_id(category_id, item_id):
 @app.route(
     '/api/categories/<int:category_id>/items/')
 def api_get_items_by_category_id(category_id):
+    """
+    API endpoint providing a list of all items within a given category
+    """
     items = session.query(Item).filter_by(category_id=category_id).all()
 
     def serialize(i):
@@ -613,6 +679,9 @@ def api_get_items_by_category_id(category_id):
 @app.route(
     '/api/categories/<int:category_id>/items/<int:item_id>/')
 def api_get_item_by_id(category_id, item_id):
+    """
+    API endpoint providing details for a given item within a category
+    """
     item = session.query(Item). \
         filter_by(category_id=category_id, id=item_id). \
         one()

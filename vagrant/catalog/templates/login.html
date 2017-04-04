@@ -32,16 +32,17 @@
         </nav>
     </header>
 
-    <!--MESSAGE FLASHING WIDGET -->
-    <div class="uk-container uk-container-center">
-        {% with messages = get_flashed_messages() %} {% if messages %}
+    <!-- MESSAGE FLASHING WIDGET -->
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <div class="uk-alert" data-uk-alert>
+        <a href="" class="uk-alert-close uk-close"></a>
         <ul>
             {% for message in messages %}
             <li><strong>{{message}}</strong></li>
             {% endfor %}
         </ul>
-        {% endif %} {% endwith %}
     </div>
+    {% endif %} {% endwith %}
 
     <!-- INCLUDED PAGE CONTENT -->
     <main id="main">
