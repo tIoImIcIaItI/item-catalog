@@ -13,7 +13,8 @@
    
 <h1>New Category</h1>
 
-<form class="uk-form uk-form-stacked" data-uk-margin 
+<form id="category-form"
+    class="uk-form uk-form-stacked" data-uk-margin 
     action="{{ url_for('create_category') }}" 
     method="POST">
 
@@ -22,13 +23,16 @@
         <label class="uk-form-label" for="name">Name</label>
 
         <input class="{{ 'uk-form-danger' if name_error else '' }}" 
+            data-autofocus
             type="text" size="30" id="name" name="name" 
             maxlength="80" minlength="2" required aria-required="true"
             placeholder="category name" value="{{ name or '' }}">
 
-        <div class="uk-text-danger" id="name_error">
+        <div id="name-error" data-error-for="name" 
+            class="validation-error uk-text-danger invisible"></div>
+
+        <div class="uk-text-danger">
             {% if name_error %}
-            <!--<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>-->
             {{ name_error }}
             {% endif %}
         </div>
@@ -53,4 +57,8 @@
     
 </main>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/categoryformviewmodel.js') }}"></script>
 {% endblock %}

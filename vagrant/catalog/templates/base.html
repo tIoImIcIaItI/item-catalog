@@ -69,5 +69,12 @@
 
     </div>
 
+    <script src="{{ url_for('static', filename='js/arrays.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/objects.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/formviewmodel.js') }}"></script>
+    <!-- INCLUDED BODY SCRIPTS -->
+    {% block scripts %}
+    {% endblock %}
 </body>
 </html>

@@ -14,7 +14,8 @@
    
 <h1>Edit {{ category.name }}</h1>
 
-<form class="uk-form uk-form-stacked" data-uk-margin
+<form id="category-form"
+    class="uk-form uk-form-stacked" data-uk-margin
     action="{{ url_for('update_category_by_id', category_id=category.id) }}" 
     method="POST">
 
@@ -23,20 +24,23 @@
         <label class="uk-form-label" for="name">Name</label>
 
         <input class="{{ 'uk-form-danger' if name_error else '' }}" 
+            data-autofocus 
             type="text" size="30" id="name" name="name" 
             maxlength="80" minlength="2" required aria-required="true"
             placeholder="category name" value="{{ name or '' }}">
 
-        <div class="uk-text-danger" id="name_error">
+        <div id="name-error" data-error-for="name" 
+            class="validation-error uk-text-danger invisible"></div>
+
+        <div class="uk-text-danger">
             {% if name_error %}
-            <!--<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>-->
             {{ name_error }}
             {% endif %}
         </div>
 
     </fieldset>
 
-    <fieldset>
+    <fieldset class="uk-form-row">
         
         <button class="uk-button uk-button-primary" type="submit" >
             <i class="fa fa-pencil" aria-hidden="true"></i>
@@ -54,4 +58,8 @@
     
 </main>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/categoryformviewmodel.js') }}"></script>
 {% endblock %}

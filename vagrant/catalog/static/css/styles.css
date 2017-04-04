@@ -40,3 +40,32 @@ nav.breadcrumbs [aria-current="page"] {
 	color: #333;
 	font-weight: 300;
 }
+
+/*---------------------------------------------------------------------------*/
+/* FORM HELPERS */
+
+.invisible {
+	visibility: hidden;
+}
+
+.required-annotation {
+	/*color: #668;*/
+	font-size: 0.5em;
+	position: relative;
+	top: -1em;
+	left: 0.5em;
+}
+
+ /*copied from uk-form-danger */
+input[aria-invalid='true'] { 
+    border-color: #dc8d99!important;
+    background: #fff7f8!important;
+    color: #d85030!important;
+}
+
+.validation-error {
+	min-height: 1.5em; /* prevent collapse causing sliding content */
+	margin: 0;
+	margin-top: 0.25em;
+	font-style: italic;
+}

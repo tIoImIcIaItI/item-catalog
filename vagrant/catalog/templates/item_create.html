@@ -14,7 +14,8 @@
    
 <h1>New Item</h1>
 
-<form class="uk-form uk-form-stacked" data-uk-margin 
+<form id="item-form"
+    class="uk-form uk-form-stacked" data-uk-margin 
     action="{{ url_for('create_item', category_id=category_id) }}" 
     method"POST">
 
@@ -23,13 +24,16 @@
         <label class="uk-form-label" for="title">Title</label>
 
         <input class="{{ 'uk-form-danger' if title_error else '' }}" 
+            data-autofocus
             type="text" size="30" id="title" name="title" 
             maxlength="80" minlength="2" required aria-required="true"
             placeholder="item title" value="{{ title or ''}}">
 
-        <div class="uk-text-danger" id="title_error">
+        <div id="title-error" data-error-for="title" 
+            class="validation-error uk-text-danger invisible"></div>
+
+        <div class="uk-text-danger">
             {% if title_error %}
-            <!--<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>-->
             {{ title_error }}
             {% endif %}
         </div>
@@ -45,9 +49,11 @@
             maxlength="250" minlength="2" required aria-required="true"
             placeholder="item description" value="{{ description or '' }}">
 
-        <div class="uk-text-danger" id="description_error">
+        <div id="description-error" data-error-for="description" 
+            class="validation-error uk-text-danger invisible"></div>
+
+        <div class="uk-text-danger">
             {% if description_error %}
-            <!--<i class="fa fa-exclamation-triangle" aria-hidden="true"></i>-->
             {{ description_error }}
             {% endif %}
         </div>
@@ -72,4 +78,8 @@
     
 </main>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/itemformviewmodel.js') }}"></script>
 {% endblock %}
