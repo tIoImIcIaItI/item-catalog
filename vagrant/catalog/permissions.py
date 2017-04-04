@@ -1,10 +1,14 @@
-from database_setup import Item, DBSession
+from datastore import session
+from datastore.item import Item
 from users import UserUtils
-
-session = DBSession()
 
 
 class Permissions(object):
+    """
+    Determines and represents the permissions available on a given resource
+    in a given context
+    """
+
     def __init__(self, create, read, update, delete):
         self.create = create
         self.read = read

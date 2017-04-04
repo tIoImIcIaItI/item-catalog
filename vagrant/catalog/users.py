@@ -1,11 +1,9 @@
 import json
-
 from flask import make_response, redirect, render_template, request, \
     session as login_session
 
-from database_setup import User, DBSession
-
-session = DBSession()
+from datastore import session
+from datastore.user import User
 
 
 class UserUtils(object):

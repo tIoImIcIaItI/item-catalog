@@ -1,20 +1,17 @@
 import json
 import random
 import string
-
 import httplib2
 import requests
-from flask import Flask, render_template, request, url_for, flash, jsonify, \
-    redirect, make_response, abort
-from flask import session as login_session
-from oauth2client.client import FlowExchangeError
-from oauth2client.client import flow_from_clientsecrets
+from flask import Flask, flash, jsonify, make_response, redirect, \
+    render_template, request, session as login_session, url_for
+from oauth2client.client import FlowExchangeError, flow_from_clientsecrets
 
-from database_setup import Category, Item, DBSession
+from datastore import session
+from datastore.category import Category
+from datastore.item import Item
 from permissions import Permissions
 from users import UserUtils
-
-session = DBSession()
 
 app = Flask(__name__)
 
@@ -84,8 +81,10 @@ def gconnect():
 
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id and \
-                    'user_id' in login_session:
+
+    if stored_access_token is not None and \
+            gplus_id == stored_gplus_id and \
+            'user_id' in login_session:
         return UserUtils.respond_with_preauthentication_url()
 
     # Store the access token in the session for later use.
@@ -198,7 +197,7 @@ def get_login_page():
 
 def extract_and_validate_category_name(form):
     """
-    :rtype: (String, String) 
+    :rtype: (String, String)
     """
     name = form.get('name')
     name_error = None
@@ -383,6 +382,9 @@ def api_get_categories():
     categories = session.query(Category).all()
 
     def serialize(c):
+        """
+        :param:
+        """
         return {
             'id': c.id,
             'user_id': c.user_id,
@@ -408,6 +410,10 @@ def api_get_category(category_id):
         session.query(Item).filter_by(category_id=category_id).all()
 
     def serialize_item(i):
+        """
+        Provides a representation of an item,
+        suitable for conversion to JSON format
+        """
         return {
             'id': i.id,
             'user_id': i.user_id,
@@ -422,6 +428,10 @@ def api_get_category(category_id):
     items = [serialize_item(item) for item in items]
 
     def serialize(c):
+        """
+        Provides a representation of a category,
+        suitable for conversion to JSON format
+        """
         return {
             'id': c.id,
             'user_id': c.user_id,
@@ -438,7 +448,7 @@ def api_get_category(category_id):
 
 def extract_and_validate_item_title(form):
     """
-    :rtype: (String, String) 
+    :rtype: (String, String)
     """
     title = form.get('title')
     title_error = None
@@ -453,7 +463,7 @@ def extract_and_validate_item_title(form):
 
 def extract_and_validate_item_description(form):
     """
-    :rtype: (String, String) 
+    :rtype: (String, String)
     """
     description = form.get('description')
     description_error = None
@@ -661,6 +671,10 @@ def api_get_items_by_category_id(category_id):
     items = session.query(Item).filter_by(category_id=category_id).all()
 
     def serialize(i):
+        """
+        Provides a representation of an item,
+        suitable for conversion to JSON format
+        """
         return {
             'id': i.id,
             'url': url_for(
@@ -687,6 +701,10 @@ def api_get_item_by_id(category_id, item_id):
         one()
 
     def serialize_item(i):
+        """
+        Provides a representation of an item,
+        suitable for conversion to JSON format
+        """
         return {
             'id': i.id,
             'user_id': i.user_id,
