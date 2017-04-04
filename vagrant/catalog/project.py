@@ -352,7 +352,7 @@ def delete_category_by_id(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
 
     if not Permissions.get_user_permissions_for_category(category).delete:
-        flash('you may delete only categories you created')
+        flash('you may delete only empty categories you created')
         return redirect(url_for(
             'get_categories'))
 
