@@ -15,7 +15,7 @@
 
 <h1>Edit {{ item.title }}</h1>
 
-<form  id="item-form"
+<form id="item-form"
     class="uk-form uk-form-stacked" data-uk-margin
     action="{{ url_for('update_item_by_id', category_id=category_id, item_id=item.id) }}"
     method="POST">
