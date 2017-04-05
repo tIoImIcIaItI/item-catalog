@@ -3,8 +3,10 @@ apt-get -qqy install postgresql python-psycopg2
 apt-get -qqy install python-flask python-sqlalchemy
 apt-get -qqy install python-pip
 pip install -U pip
-pip install packaging
-pip install setuptools
+pip install -U packaging
+pip install -U setuptools
+pip install -U six
+pip install appdirs
 pip install bleach
 pip install oauth2client
 pip install requests
