@@ -165,10 +165,6 @@ def gdisconnect():
     del login_session['picture']
     del login_session['user_id']
 
-    # response = make_response(json.dumps('Successfully disconnected.'), 200)
-    # response.headers['Content-Type'] = 'application/json'
-    # return response
-
     return UserUtils.return_to_preauthentication_url()
 
 
@@ -197,6 +193,8 @@ def get_login_page():
 
 def extract_and_validate_category_name(form):
     """
+	Returns the value and validaton error of the
+	category name contained in the form
     :rtype: (String, String)
     """
     name = form.get('name')
@@ -383,7 +381,8 @@ def api_get_categories():
 
     def serialize(c):
         """
-        :param:
+        Provides a representation of a category,
+        suitable for conversion to JSON format
         """
         return {
             'id': c.id,
@@ -448,6 +447,8 @@ def api_get_category(category_id):
 
 def extract_and_validate_item_title(form):
     """
+	Returns the value and validaton error of the
+	item title contained in the form
     :rtype: (String, String)
     """
     title = form.get('title')
@@ -463,6 +464,8 @@ def extract_and_validate_item_title(form):
 
 def extract_and_validate_item_description(form):
     """
+	Returns the value and validaton error of the
+	item description contained in the form
     :rtype: (String, String)
     """
     description = form.get('description')
