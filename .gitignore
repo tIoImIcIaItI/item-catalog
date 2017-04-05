@@ -1,3 +1,6 @@
+# Vagrant VM directory
+\.vagrant/
+
 # Compiled Python files
 **/*.pyc
 
