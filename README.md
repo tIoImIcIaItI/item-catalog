@@ -19,21 +19,25 @@ The [`vagrant/catalog/static/`](vagrant/catalog/static/) folder contains the cus
 - jQuery 3 is used only as a dependency of UIKit.
 
 ## Building the App
-
-All files needed to run the application have been prepared and are included in the distribution.
-A pre-populated database is provided also.
+- Clone the repository (`git clone https://github.com/tIoImIcIaItI/item-catalog.git`)
+- Create a file named `client_secrets.json` in the [`catalog`](vagrant/catalog/) folder.
+- Paste in the JSON content provided to you separately.
+- Save the file.
 
 ## Running the App
 
-1. Install Vagrant and VirtualBox, then launch the Vagrant VM (`vagrant up`).
+- Install Vagrant and VirtualBox.
+- Open a shell/terminal/command prompt on the [`vagrant`](vagrant/) folder of the cloned repository.
+- Launch the Vagrant VM (`vagrant up`).
+- Connect to the VM (`vagrant ssh`) and change to the project directory (`cd /vagrant/catalog`).
+- Run [`project.py`](vagrant/catalog/project.py) with a Python 2.7 interpreter (`python project.py`).
+- Browse to [`http://localhost:5000/`](http://localhost:5000/) in a modern web browser.
 
-2. Within the VM, run [`catalog/project.py`](vagrant/catalog/project.py) with a Python 2.7 interpreter.
-
-3. Browse to [`http://localhost:5000/`](http://localhost:5000/) in a modern web browser.
+A pre-populated database is provided.
 
 ## Using the App
 
-The user is initially presented with a list of all categories. Clicking a category presents the details of that categroy, notably the list of associated items. Clicking an item presents its details.
+The user is initially presented with a list of all categories. Clicking a category presents the details of that category, notably the list of associated items. Clicking an item presents its details.
 
 Authentication and user account details are managed via Google's services.
 
@@ -46,7 +50,7 @@ Authentication and user account details are managed via Google's services.
 #### Additional Functionality for Authenticated Users
 - Create categories and items
 - Edit categories and items they created
-- Delete empty categories they created (i.e. those with no associated items) 
+- Delete empty categories they created (i.e. those with no associated items)
 - Delete items they created
 - Sign out
 
