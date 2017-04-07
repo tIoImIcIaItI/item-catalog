@@ -9,3 +9,6 @@
 
 # Google Client Secrets file
 client_secrets.json
+
+# Data Store config and secrets
+/vagrant/catalog/datastore/config.py
